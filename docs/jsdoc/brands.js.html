@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: brands.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: brands.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const API_BASE_URL = "https://dev-avice231.users.info.unicaen.fr/semestre4/bikestores/bikestores-api";
+const API_KEY = "e8f1997c763";
+const ITEMS_PER_PAGE = 50;
+
+const tableBody = document.getElementById("brandsTableBody");
+const addBtn = document.getElementById("addBrandBtn");
+const messageBox = document.getElementById("messageBox");
+
+const brandForm = document.getElementById("brandForm");
+const brandIdInput = document.getElementById("brandId");
+const brandNameInput = document.getElementById("brandName");
+let searchNameInput = document.getElementById("searchName");
+
+if (!searchNameInput) {
+    const pageContainer = document.querySelector(".container.mt-4");
+
+    if (pageContainer) {
+        const row = document.createElement("div");
+        row.className = "row mb-3";
+        row.innerHTML = `
+            &lt;div class="col-md-4">
+                &lt;label for="searchName" class="form-label">Search by Name&lt;/label>
+                &lt;input type="text" id="searchName" class="form-control" placeholder="Type a brand name...">
+            &lt;/div>
+        `;
+
+        const messageBoxNode = document.getElementById("messageBox");
+        if (messageBoxNode) {
+            pageContainer.insertBefore(row, messageBoxNode);
+        } else {
+            pageContainer.appendChild(row);
+        }
+
+        searchNameInput = document.getElementById("searchName");
+    }
+}
+
+const prevPageBtn = document.getElementById("prevPageBtn");
+const nextPageBtn = document.getElementById("nextPageBtn");
+const pageInfo = document.getElementById("pageInfo");
+
+const brandModal = new bootstrap.Modal(document.getElementById("brandModal"));
+const brandModalTitle = document.getElementById("brandModalTitle");
+
+let brands = [];
+let currentPage = 1;
+
+/**
+ * Displays a feedback message to the user.
+ *
+ * @param {string} message - The message text.
+ * @param {"error"|"success"} [type="error"] - The message type.
+ * @returns {void}
+ */
+function setMessage(message, type = "error") {
+    messageBox.className = `mb-3 ${type === "success" ? "text-success" : "text-danger"}`;
+    messageBox.textContent = message;
+}
+
+/**
+ * Clears the feedback area.
+ *
+ * @returns {void}
+ */
+function clearMessage() {
+    messageBox.textContent = "";
+}
+
+/**
+ * Fetches JSON data and returns both response and parsed payload.
+ *
+ * @param {string} url - The request URL.
+ * @param {RequestInit} [options={}] - Fetch options.
+ * @returns {Promise&lt;{response: Response, data: any}>} The response and parsed JSON.
+ */
+async function fetchJson(url, options = {}) {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    return { response, data };
+}
+
+/**
+ * Loads all brands from the API and refreshes pagination.
+ *
+ * @returns {Promise&lt;void>} A promise resolved when brands are loaded.
+ */
+async function loadBrands() {
+
+    clearMessage();
+
+    try {
+
+        const { data } = await fetchJson(`${API_BASE_URL}/brands`);
+
+        brands = data;
+        currentPage = 1;
+
+        renderBrands();
+
+    } catch (error) {
+
+        setMessage("Unable to load brands.");
+        console.error(error);
+
+    }
+
+}
+
+/**
+ * Renders the current paginated list of brands.
+ *
+ * @returns {void}
+ */
+function renderBrands() {
+    const filteredBrands = getFilteredBrands();
+    const totalPages = Math.max(1, Math.ceil(filteredBrands.length / ITEMS_PER_PAGE));
+
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    const pageItems = filteredBrands.slice(start, start + ITEMS_PER_PAGE);
+
+    tableBody.innerHTML = "";
+
+    pageItems.forEach(brand => {
+
+        tableBody.innerHTML += `
+            &lt;tr>
+                &lt;td>${brand.brand_id}&lt;/td>
+                &lt;td>${brand.brand_name}&lt;/td>
+                &lt;td>
+                    &lt;button class="btn btn-warning btn-sm me-1" onclick="editBrand(${brand.brand_id})">Edit&lt;/button>
+                    &lt;button class="btn btn-danger btn-sm" onclick="deleteBrand(${brand.brand_id})">Delete&lt;/button>
+                &lt;/td>
+            &lt;/tr>
+        `;
+    });
+
+    pageInfo.textContent = `Page ${currentPage} / ${totalPages}`;
+
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+
+}
+
+/**
+ * Returns brands filtered by the current name query.
+ *
+ * @returns {Array&lt;Object>} The filtered brand list.
+ */
+function getFilteredBrands() {
+    const query = (searchNameInput ? searchNameInput.value : "").trim().toLowerCase();
+
+    if (!query) {
+        return brands;
+    }
+
+    return brands.filter(brand =>
+        String(brand.brand_name).toLowerCase().includes(query)
+    );
+}
+
+addBtn.addEventListener("click", () => {
+
+    brandIdInput.value = "";
+    brandNameInput.value = "";
+
+    brandModalTitle.textContent = "Add Brand";
+
+    brandModal.show();
+
+});
+
+/**
+ * Handles brand form submission for create and update operations.
+ *
+ * @param {SubmitEvent} event - The form submit event.
+ * @returns {Promise&lt;void>} A promise resolved when save operation completes.
+ */
+async function handleBrandSubmit(event) {
+
+    event.preventDefault();
+
+    const id = brandIdInput.value;
+    const method = id ? "PUT" : "POST";
+    const url = id ? `${API_BASE_URL}/brands/${id}` : `${API_BASE_URL}/brands`;
+
+    const payload = {
+        brand_name: brandNameInput.value.trim()
+    };
+
+    try {
+        const { response, data } = await fetchJson(url, {
+            method,
+            headers: {
+                "Content-Type": "application/json",
+                "X-API-KEY": API_KEY
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            setMessage(data.error || "Operation failed.");
+            return;
+        }
+
+        brandModal.hide();
+        await loadBrands();
+        setMessage(id ? "Brand updated successfully." : "Brand added successfully.", "success");
+    } catch (error) {
+        setMessage("Unable to save brand.");
+        console.error(error);
+    }
+
+}
+
+brandForm.addEventListener("submit", handleBrandSubmit);
+
+/**
+ * Loads one brand and opens the modal in edit mode.
+ *
+ * @param {number} id - The brand identifier.
+ * @returns {Promise&lt;void>} A promise resolved when the modal is populated.
+ */
+async function editBrand(id) {
+
+    try {
+        const { response, data } = await fetchJson(`${API_BASE_URL}/brands/${id}`);
+
+        if (!response.ok) {
+            setMessage(data.error || "Brand not found.");
+            return;
+        }
+
+        brandIdInput.value = data.brand_id;
+        brandNameInput.value = data.brand_name;
+
+        brandModalTitle.textContent = "Edit Brand";
+
+        brandModal.show();
+    } catch (error) {
+        setMessage("Unable to load brand.");
+        console.error(error);
+    }
+
+}
+
+/**
+ * Deletes a brand by identifier after confirmation.
+ *
+ * @param {number} id - The brand identifier.
+ * @returns {Promise&lt;void>} A promise resolved when deletion is processed.
+ */
+async function deleteBrand(id) {
+
+    if (!confirm("Delete this brand ?")) return;
+
+    try {
+        const { response, data } = await fetchJson(`${API_BASE_URL}/brands/${id}`, {
+            method: "DELETE",
+            headers: { "X-API-KEY": API_KEY }
+        });
+
+        if (!response.ok) {
+            setMessage(data.error || "Delete failed.");
+            return;
+        }
+
+        await loadBrands();
+        setMessage("Brand deleted successfully.", "success");
+    } catch (error) {
+        setMessage("Unable to delete brand.");
+        console.error(error);
+    }
+
+}
+
+prevPageBtn.onclick = () => {
+
+    if (currentPage > 1) {
+        currentPage--;
+        renderBrands();
+    }
+
+};
+
+nextPageBtn.onclick = () => {
+
+    const totalPages = Math.max(1, Math.ceil(getFilteredBrands().length / ITEMS_PER_PAGE));
+
+    if (currentPage &lt; totalPages) {
+        currentPage++;
+        renderBrands();
+    }
+
+};
+
+if (searchNameInput) {
+    searchNameInput.addEventListener("input", () => {
+        currentPage = 1;
+        renderBrands();
+    });
+}
+
+loadBrands();</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#buildProductsUrl">buildProductsUrl</a></li><li><a href="global.html#canAccessEmployeesPage">canAccessEmployeesPage</a></li><li><a href="global.html#canManageEmployees">canManageEmployees</a></li><li><a href="global.html#canManageProducts">canManageProducts</a></li><li><a href="global.html#canManageStocks">canManageStocks</a></li><li><a href="global.html#canSeeAllStores">canSeeAllStores</a></li><li><a href="global.html#clearMessage">clearMessage</a></li><li><a href="global.html#configureRoleOptions">configureRoleOptions</a></li><li><a href="global.html#deleteBrand">deleteBrand</a></li><li><a href="global.html#deleteCategory">deleteCategory</a></li><li><a href="global.html#deleteEmployee">deleteEmployee</a></li><li><a href="global.html#deleteProduct">deleteProduct</a></li><li><a href="global.html#deleteStock">deleteStock</a></li><li><a href="global.html#deleteStore">deleteStore</a></li><li><a href="global.html#editBrand">editBrand</a></li><li><a href="global.html#editCategory">editCategory</a></li><li><a href="global.html#editEmployee">editEmployee</a></li><li><a href="global.html#editProduct">editProduct</a></li><li><a href="global.html#editStock">editStock</a></li><li><a href="global.html#editStore">editStore</a></li><li><a href="global.html#fetchJson">fetchJson</a></li><li><a href="global.html#getFilteredBrands">getFilteredBrands</a></li><li><a href="global.html#getFilteredCategories">getFilteredCategories</a></li><li><a href="global.html#getFilteredEmployees">getFilteredEmployees</a></li><li><a href="global.html#getFilteredProducts">getFilteredProducts</a></li><li><a href="global.html#getFilteredStocks">getFilteredStocks</a></li><li><a href="global.html#getFilteredStores">getFilteredStores</a></li><li><a href="global.html#getPageName">getPageName</a></li><li><a href="global.html#handleBrandSubmit">handleBrandSubmit</a></li><li><a href="global.html#handleCategorySubmit">handleCategorySubmit</a></li><li><a href="global.html#handleEmployeeSubmit">handleEmployeeSubmit</a></li><li><a href="global.html#handleLoginSubmit">handleLoginSubmit</a></li><li><a href="global.html#handleProductSubmit">handleProductSubmit</a></li><li><a href="global.html#handleProfileSubmit">handleProfileSubmit</a></li><li><a href="global.html#handleStockSubmit">handleStockSubmit</a></li><li><a href="global.html#handleStoreSubmit">handleStoreSubmit</a></li><li><a href="global.html#loadBrands">loadBrands</a></li><li><a href="global.html#loadCategories">loadCategories</a></li><li><a href="global.html#loadEmployees">loadEmployees</a></li><li><a href="global.html#loadProducts">loadProducts</a></li><li><a href="global.html#loadProfile">loadProfile</a></li><li><a href="global.html#loadStocks">loadStocks</a></li><li><a href="global.html#loadStores">loadStores</a></li><li><a href="global.html#logout">logout</a></li><li><a href="global.html#markActiveMenuLink">markActiveMenuLink</a></li><li><a href="global.html#markActiveUserLink">markActiveUserLink</a></li><li><a href="global.html#renderBrands">renderBrands</a></li><li><a href="global.html#renderCategories">renderCategories</a></li><li><a href="global.html#renderEmployees">renderEmployees</a></li><li><a href="global.html#renderMenu">renderMenu</a></li><li><a href="global.html#renderProducts">renderProducts</a></li><li><a href="global.html#renderStocks">renderStocks</a></li><li><a href="global.html#renderStores">renderStores</a></li><li><a href="global.html#resetForm">resetForm</a></li><li><a href="global.html#setMessage">setMessage</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.5</a> on Fri Mar 20 2026 10:48:25 GMT+0100 (heure normale d’Europe centrale)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

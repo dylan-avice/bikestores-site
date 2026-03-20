@@ -1,0 +1,303 @@
+:root {
+    --bike-blue: #0a2540;
+    --bike-blue-2: #13385f;
+    --bike-orange: #f06016;
+    --bike-bg: #f5f7fa;
+    --bike-surface: #ffffff;
+    --bike-border: #d9e1ea;
+    --bike-text: #1c3045;
+    --bike-muted: #5f6f82;
+    --bike-shadow: 0 8px 20px rgba(10, 37, 64, 0.08);
+}
+
+body,
+body.bg-light {
+    background-color: var(--bike-bg) !important;
+    color: var(--bike-text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--bike-blue);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.navbar {
+    background: var(--bike-blue) !important;
+    border-bottom: 2px solid #091f34;
+    box-shadow: 0 4px 14px rgba(10, 37, 64, 0.22);
+}
+
+.brand-wordmark,
+.navbar-brand {
+    font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.login-brand-title {
+    justify-content: center;
+    color: var(--bike-blue);
+}
+
+.navbar-brand-logo {
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 0.35rem;
+}
+
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar-toggler:focus,
+.navbar-toggler:active,
+.navbar-toggler:focus-visible {
+    outline: none;
+    box-shadow: none;
+}
+
+#menu .nav-link {
+    border-radius: 0.2rem;
+    color: rgba(255, 255, 255, 0.86);
+    padding: 0.45rem 0.7rem;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#menu .nav-link:hover,
+#menu .nav-link:focus-visible {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+#menu .nav-link.active {
+    color: #0a2540 !important;
+    font-weight: 700 !important;
+    background-color: rgba(240, 96, 22, 0.9);
+}
+
+#userInfo,
+#userInfo a {
+    color: #ffffff !important;
+}
+
+#userInfo a {
+    display: inline-block;
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.2rem;
+    transition: background-color 0.2s ease;
+}
+
+#userInfo a:hover,
+#userInfo a:focus-visible {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+#userInfo a.active {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.container.mt-4,
+.container.mt-5 {
+    background: var(--bike-surface);
+    border: 1px solid var(--bike-border);
+    border-radius: 0.3rem;
+    box-shadow: var(--bike-shadow);
+    padding: 1.25rem;
+}
+
+.container.min-vh-100 {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.card,
+#profileForm,
+.modal-content {
+    border: 1px solid var(--bike-border);
+    border-radius: 0.3rem;
+    box-shadow: var(--bike-shadow);
+}
+
+.modal-header {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--bike-border);
+}
+
+.modal-footer {
+    border-top: 1px solid var(--bike-border);
+}
+
+.form-label {
+    color: var(--bike-blue);
+    font-weight: 600;
+}
+
+.form-control,
+.form-select {
+    border: 1px solid #c9d3df;
+    border-radius: 0.2rem;
+    color: var(--bike-text);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: rgba(10, 37, 64, 0.55);
+    box-shadow: 0 0 0 0.2rem rgba(10, 37, 64, 0.14);
+}
+
+.form-control.bg-light,
+.form-select.bg-light {
+    background-color: #edf2f7 !important;
+    color: #536478 !important;
+    border-color: #d3dbe6;
+}
+
+.btn {
+    border-radius: 0.2rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-primary {
+    background-color: var(--bike-blue);
+    border-color: var(--bike-blue);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.btn-primary:active,
+.btn-primary.active,
+.show > .btn-primary.dropdown-toggle {
+    background-color: #081d32;
+    border-color: #081d32;
+}
+
+[id^="add"][id$="Btn"] {
+    min-width: 10.5rem;
+    height: 2.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+}
+
+.btn-secondary {
+    background-color: #4f6074;
+    border-color: #4f6074;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible,
+.btn-secondary:active,
+.btn-secondary.active,
+.show > .btn-secondary.dropdown-toggle {
+    background-color: #445466;
+    border-color: #445466;
+}
+
+.btn-outline-light {
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:focus-visible {
+    color: var(--bike-blue);
+    background: #ffffff;
+    border-color: #ffffff;
+}
+
+.table {
+    border-color: #d9e1ea;
+    margin-bottom: 0;
+}
+
+.table > :not(caption) > * > * {
+    vertical-align: middle;
+    padding-top: 0.72rem;
+    padding-bottom: 0.72rem;
+}
+
+.table-dark,
+.table-dark > th,
+.table-dark > td {
+    --bs-table-bg: var(--bike-blue);
+    --bs-table-color: #ffffff;
+    --bs-table-striped-bg: #123353;
+    --bs-table-striped-color: #ffffff;
+    --bs-table-hover-bg: #194068;
+    --bs-table-hover-color: #ffffff;
+    border-color: #09213a;
+}
+
+.table-hover > tbody > tr:hover > * {
+    --bs-table-accent-bg: rgba(10, 37, 64, 0.045);
+}
+
+#messageBox,
+#loginMessage {
+    border: 1px solid rgba(240, 96, 22, 0.25);
+    background: rgba(240, 96, 22, 0.08);
+    color: #9d420e;
+    border-radius: 0.2rem;
+    padding: 0.6rem 0.8rem;
+}
+
+#messageBox {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+#messageBox:empty,
+#loginMessage:empty {
+    display: none;
+}
+
+#pageInfo {
+    color: var(--bike-muted);
+    font-weight: 600;
+}
+
+.table-responsive {
+    border: 1px solid #d9e1ea;
+    border-radius: 0.3rem;
+    background: #ffffff;
+}
+
+@media (max-width: 991.98px) {
+    .container.mt-4,
+    .container.mt-5 {
+        padding: 1rem;
+    }
+
+    #navbarMenu {
+        margin-top: 0.7rem;
+        padding-top: 0.65rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.16);
+    }
+}
+
+@media (max-width: 767.98px) {
+    h1 {
+        font-size: 1.55rem;
+    }
+
+    .d-flex.justify-content-between.mb-3,
+    .d-flex.justify-content-between.align-items-center.mb-3 {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: 0.8rem;
+    }
+}
