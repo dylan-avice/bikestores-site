@@ -50,10 +50,6 @@ function clearMessage() {
     messageBox.textContent = "";
 }
 
-if (currentUser.employee_role !== "it") {
-    window.location.href = "index.html";
-}
-
 /**
  * Sends a request and returns parsed JSON with original response.
  *
