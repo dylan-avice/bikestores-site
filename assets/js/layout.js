@@ -95,6 +95,10 @@ function renderMenu() {
         <li class="nav-item">
             <a class="nav-link" href="stocks.html">Stocks</a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="stores.html">Stores</a>
+        </li>
     `;
 
     if (user.employee_role === "chief" || user.employee_role === "it") {
@@ -102,15 +106,6 @@ function renderMenu() {
         html += `
         <li class="nav-item">
             <a class="nav-link" href="employees.html">Employees</a>
-        </li>
-        `;
-    }
-
-    if (user.employee_role === "it") {
-
-        html += `
-        <li class="nav-item">
-            <a class="nav-link" href="stores.html">Stores</a>
         </li>
         `;
     }
